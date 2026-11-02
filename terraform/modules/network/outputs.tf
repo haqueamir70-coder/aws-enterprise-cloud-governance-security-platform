@@ -22,3 +22,8 @@ output "nat_gateway_ids" {
   description = "NAT gateway IDs; empty when NAT is disabled."
   value       = aws_nat_gateway.this[*].id
 }
+
+output "flow_log_group_name" {
+  description = "CloudWatch log group name; null when Flow Logs are disabled."
+  value       = var.enable_flow_logs ? aws_cloudwatch_log_group.flow_logs[0].name : null
+}
