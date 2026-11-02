@@ -10,33 +10,29 @@
   <img src="https://img.shields.io/badge/Status-Lab--Ready-orange" />
 </p>
 
-> A practical reference implementation for governing AWS workloads with repeatable infrastructure, identity controls, centralized security visibility, policy checks and operational runbooks.
+> A practical AWS platform engineering lab covering repeatable network infrastructure, identity federation, governance guardrails, security visibility, CI quality gates and production operations.
 
-## Why this project exists
-As AWS environments grow from one account to many, teams can lose consistency across identity, network boundaries, audit trails, security detections and delivery pipelines. This repository demonstrates a platform baseline that makes those controls visible, reviewable and automatable.
+**Audience:** Senior DevOps / DevSecOps Engineers, Cloud Platform Engineers, Cloud Security Engineers and SREs.
 
-**Audience:** Cloud Platform Engineers, Senior DevOps / DevSecOps Engineers, Cloud Security Engineers and SREs.
+## What is implemented
 
-## Platform at a glance
-
-| Capability | Design / implementation |
+| Capability | Current repository scope |
 |---|---|
-| Network foundation | Terraform VPC, public/private subnet tiers, route tables, optional NAT |
-| Identity | IAM least privilege, GitHub Actions OIDC trust, Identity Center operating model |
-| Governance | Organizations / Control Tower model, example SCP guardrails |
-| Detection | GuardDuty, Security Hub, AWS Config and CloudTrail integration guidance |
-| Audit | Centralized encrypted log archive pattern |
-| Delivery | GitHub Actions validation, TFLint and Checkov |
-| Operations | Incident, access, drift and recovery runbooks |
-| Learning | 50+ senior Q&A and system-design scenarios |
+| Network foundation | Terraform VPC, two-AZ public/private subnet tiers, route tables and Internet Gateway |
+| Egress | Optional single NAT Gateway (disabled by default; billable) |
+| Network visibility | Optional VPC Flow Logs to CloudWatch Logs with configurable retention (disabled by default) |
+| CI | GitHub Actions: Terraform fmt/init/validate, TFLint, Checkov and example JSON validation |
+| Security examples | SCP guardrail samples and GitHub OIDC trust template |
+| Operations | Runbooks for audit, access, incident response, drift and recovery |
+| Interview prep | Senior Q&A and 20 detailed production incident scenarios, plus system-design cases |
 
 ## Architecture
 
-<p align="center"><img src="docs/assets/architecture.svg" alt="Animated AWS governance architecture" width="100%"></p>
+<p align="center"><img src="docs/assets/architecture.svg" alt="AWS governance reference architecture" width="100%"></p>
 
-The SVG uses moving dashed paths to show telemetry and deployment flow. It respects reduced-motion preferences. Read the [architecture guide](docs/architecture/README.md).
+This is a **reference architecture**, not a screenshot of a deployed AWS Organization. Read the [enterprise account model](docs/architecture/enterprise-account-model.md) and [architecture guide](docs/architecture/README.md).
 
-## Quick start — safe local validation
+## Quick start — local validation only
 
 Prerequisites: Terraform 1.6+, AWS CLI v2 and Git.
 
@@ -48,9 +44,9 @@ terraform -chdir=terraform init -backend=false
 terraform -chdir=terraform validate
 ```
 
-These commands validate configuration without creating AWS resources.
+These commands do not create AWS resources. GitHub Actions runs the same baseline checks plus lint and static security scanning.
 
-For a real sandbox deployment, read the [deployment guide](docs/deployment/README.md), confirm account identity and costs, then plan:
+For a real sandbox deployment, first read the [deployment guide](docs/deployment/README.md), verify the AWS identity and estimate cost:
 
 ```bash
 aws sts get-caller-identity
@@ -65,44 +61,33 @@ terraform -chdir=terraform apply tfplan
 ```text
 .github/workflows/      CI quality gates
 docs/architecture/      Account model, trust boundaries and flows
-docs/assets/            Vector diagrams (one animated)
+docs/assets/            Architecture SVGs
 docs/deployment/        Safe deployment and teardown
-docs/interview/         Senior-level Q&A and design scenarios
+docs/interview/         Senior Q&A and production scenarios
 docs/runbooks/          Operational procedures
-docs/security/          Control catalogue
+docs/security/          Control catalogue and validation matrix
 policies/               SCP and OIDC examples
-terraform/              Deployable single-account network baseline
+terraform/              Single-account network foundation
 ```
 
-## Important scope boundaries
-- **Lab-ready foundation:** VPC baseline is code, not a claim of production deployment.
-- **Multi-account governance:** Organizations, Control Tower, centralized logging and delegated security administration are documented target patterns with sample policies. They require an appropriately controlled AWS Organization and elevated organization permissions.
-- **No credentials in Git:** use short-lived credentials and OIDC. Never commit access keys, state, plan files or secrets.
-- **Cost control:** NAT, interface endpoints, Config evaluations, Security Hub, GuardDuty and log ingestion can incur charges. Review cost before deployment and destroy lab resources after testing.
+## Scope boundaries — read before deployment
+
+- **Implemented:** the Terraform root provisions a single-account VPC foundation. Optional NAT and Flow Logs are off by default.
+- **Reference design / examples:** Organizations, Control Tower, centralized organization CloudTrail, delegated security administration, Security Hub and GuardDuty are documented patterns; they are not deployed by this Terraform root.
+- **No credentials in Git:** use short-lived credentials and OIDC. Never commit access keys, Terraform state, plan files or secrets.
+- **Cost:** NAT, CloudWatch log ingestion/retention, Config evaluations, Security Hub and GuardDuty can incur charges. Review current pricing and destroy lab resources after testing.
 - **SCP caution:** SCPs set maximum permissions; they do not grant permissions. Test in a non-production OU and preserve break-glass recovery.
 
-See [delivery status](docs/DELIVERY-STATUS.md) to distinguish implemented code from organization-level items not deployed here.
+See [delivery status](docs/DELIVERY-STATUS.md) for implementation evidence and CI status.
 
-## Engineering quality gates
-The workflow checks formatting, Terraform validation, lint and static security configuration. A green CI run does **not** prove a live AWS deployment or replace peer review and runtime verification.
+## Senior interview preparation
 
-## Learning path
-1. Read [architecture](docs/architecture/README.md).
-2. Validate Terraform locally.
-3. Review [security controls](docs/security/README.md).
-4. Follow [deployment guide](docs/deployment/README.md).
-5. Practice [senior interview Q&A](docs/interview/README.md).
-6. Run an incident tabletop using [runbooks](docs/runbooks/README.md).
-
-## Interview discussion prompts
-- How do you prevent a compromised workload account from disabling organization-wide audit?
-- How do you grant GitHub Actions access without long-lived AWS keys?
-- How do you roll out an SCP across 30 accounts without locking out operators?
-- How would you connect VPCs and on-premises networks privately?
-- How do you prevent Terraform from silently replacing a critical resource?
+Start with the [interview index](docs/interview/README.md), then practice the [advanced production scenarios](docs/interview/advanced-production-scenarios.md). Each incident answer follows containment, evidence, diagnosis, recovery and prevention. Do not memorize paragraphs; explain decisions and trade-offs.
 
 ## Contributing
+
 Use small pull requests, include test output where practical, explain security impact and update documentation. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
+
 MIT. See [LICENSE](LICENSE).

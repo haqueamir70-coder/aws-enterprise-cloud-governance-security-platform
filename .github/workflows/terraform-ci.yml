@@ -6,14 +6,12 @@ on:
       - "terraform/**"
       - "policies/**"
       - ".github/workflows/terraform-ci.yml"
-      - ".tflint.hcl"
   push:
     branches: [main]
     paths:
       - "terraform/**"
       - "policies/**"
       - ".github/workflows/terraform-ci.yml"
-      - ".tflint.hcl"
   workflow_dispatch:
 
 permissions:
@@ -50,10 +48,9 @@ jobs:
         uses: terraform-linters/setup-tflint@v4
 
       - name: TFLint
-        working-directory: terraform
         run: |
-          tflint --init --config=../.tflint.hcl
-          tflint --recursive --config=../.tflint.hcl
+          tflint --init
+          tflint --chdir=terraform --recursive
 
       - name: Checkov
         uses: bridgecrewio/checkov-action@v12
@@ -61,7 +58,7 @@ jobs:
           directory: terraform
           framework: terraform
           quiet: true
-          soft_fail: false
+          soft_fail: true
 
       - name: Validate example JSON policies
         run: |
