@@ -1,14 +1,24 @@
 output "vpc_id" {
+  description = "ID of the network VPC."
   value       = aws_vpc.this.id
-  description = "VPC ID."
 }
 
 output "public_subnet_ids" {
-  value       = [for subnet in aws_subnet.public : subnet.id]
   description = "Public subnet IDs."
+  value       = aws_subnet.public[*].id
 }
 
 output "private_subnet_ids" {
-  value       = [for subnet in aws_subnet.private : subnet.id]
   description = "Private subnet IDs."
+  value       = aws_subnet.private[*].id
+}
+
+output "internet_gateway_id" {
+  description = "Internet gateway ID."
+  value       = aws_internet_gateway.this.id
+}
+
+output "nat_gateway_ids" {
+  description = "NAT gateway IDs; empty when NAT is disabled."
+  value       = aws_nat_gateway.this[*].id
 }
