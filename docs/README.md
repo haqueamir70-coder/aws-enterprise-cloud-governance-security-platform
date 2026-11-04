@@ -76,3 +76,7 @@ Test SCPs and config rules in a sandbox/OU, use audit-first rollout, validate al
 ### 10. Answer
 
 Organization-wide services require organization setup, delegated administration, permissions and account coverage. A standalone Terraform validation cannot prove those services are active.
+
+## Complete zero-to-hero guide
+
+See [ZERO-TO-HERO.md](./ZERO-TO-HERO.md) for the business scenario, architecture walkthrough, tool-by-tool explanations, implementation sequence, practical commands, troubleshooting playbook and additional scenario-based interview questions with answers.
