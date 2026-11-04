@@ -33,3 +33,46 @@ flowchart TB
 
 ## Interview preparation note
 For every answer, explain the architecture, trust boundary, failure mode, telemetry, cost implication and validation evidence. Distinguish implemented, CI-validated, cloud-deployed and planned capabilities.
+
+
+## Interview questions — suggested answers
+
+### 1. Answer
+
+AWS Organizations groups accounts into organizational units and supports consolidated governance, billing and policy boundaries across an enterprise.
+
+### 2. Answer
+
+SCPs set maximum permissions available to principals in member accounts; IAM policies grant permissions within those boundaries. An SCP does not grant access by itself.
+
+### 3. Answer
+
+Use separate accounts for workloads/environments, controlled ingress/egress, shared network services, private subnets and explicit routing/inspection between trust zones.
+
+### 4. Answer
+
+GitHub OIDC lets workflows assume a scoped IAM role with short-lived credentials. Restrict trust to repository/ref/environment and grant only required actions.
+
+### 5. Answer
+
+Centralize CloudTrail organization trails and protected log storage; aggregate AWS Config, GuardDuty and Security Hub findings into a security account.
+
+### 6. Answer
+
+AWS Config records resource configuration and evaluates compliance; Security Hub aggregates security posture findings from AWS services and partner tools.
+
+### 7. Answer
+
+Use policy controls for encryption and public access, account baselines, least-privilege IAM and continuous config/security detection. Test controls before broad enforcement.
+
+### 8. Answer
+
+Use separate state per account/environment or platform layer, remote encrypted S3 state with locking mechanism, versioning and tightly scoped role access.
+
+### 9. Answer
+
+Test SCPs and config rules in a sandbox/OU, use audit-first rollout, validate allowed and denied actions and document break-glass procedures.
+
+### 10. Answer
+
+Organization-wide services require organization setup, delegated administration, permissions and account coverage. A standalone Terraform validation cannot prove those services are active.
