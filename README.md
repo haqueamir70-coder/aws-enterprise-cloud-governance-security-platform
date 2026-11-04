@@ -162,3 +162,8 @@ Use small pull requests, include test output where practical, explain security i
 ## License
 
 MIT. See [LICENSE](LICENSE).
+
+
+## Architecture and interview preparation
+
+See the [architecture diagram and interview questions](docs/README.md) for the repository-specific design walkthrough and technical interview guide.
