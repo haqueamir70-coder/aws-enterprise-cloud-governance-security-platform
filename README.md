@@ -1,123 +1,104 @@
 <div align="center">
 
-<img src="https://capsule-render.vercel.app/api?type=waving&color=0:111827,50:FF9900,100:FBBF24&height=190&section=header&text=AWS+Enterprise+Cloud+Governance&fontSize=32&fontColor=ffffff&animation=fadeIn" alt="AWS Enterprise Cloud Governance project banner" width="100%" />
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:111827,45:B45309,100:FBBF24&height=230&section=header&text=AWS%20Enterprise%20Governance&fontSize=36&fontColor=ffffff&animation=fadeIn" width="100%" alt="AWS Enterprise Cloud Governance and Security"/>
 
-<img src="https://readme-typing-svg.demolab.com/?font=Inter&weight=600&size=16&pause=1600&color=38BDF8&center=true&vCenter=true&width=900&height=36&lines=AWS+Enterprise+Cloud+Governance+%E2%80%A2+Architecture+%E2%80%A2+Automation+%E2%80%A2+Security" alt="Animated project focus line" />
+### Multi-account patterns · Network foundations · Identity · Audit
 
-![AWS](https://img.shields.io/badge/Cloud+Governance-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white) ![Terraform](https://img.shields.io/badge/Infrastructure+as+Code-844FBA?style=for-the-badge&logo=terraform&logoColor=white) ![Security](https://img.shields.io/badge/Cloud+Security-2563EB?style=for-the-badge)
+[![AWS](https://img.shields.io/badge/AWS-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)](https://aws.amazon.com/)
+[![Terraform](https://img.shields.io/badge/Terraform-844FBA?style=for-the-badge&logo=terraform&logoColor=white)](https://developer.hashicorp.com/terraform)
+[![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)](https://docs.github.com/actions)
+[![Security](https://img.shields.io/badge/Cloud_Security-1F6FEB?style=for-the-badge)](https://docs.aws.amazon.com/security/)
+
+**A practical AWS cloud-governance lab covering a Terraform VPC foundation, identity federation examples, organization guardrails, security visibility and operational runbooks.**
+
+[Enterprise architecture](#-enterprise-reference-architecture) · [VPC lab](#-terraform-network-foundation) · [Quick start](#-quick-start) · [Runbooks](docs/runbooks/)
 
 </div>
 
----
+> [!IMPORTANT]
+> **Scope boundary:** the current Terraform root implements a single-account VPC foundation. AWS Organizations, Control Tower, organization CloudTrail, delegated security administration, Security Hub and GuardDuty are reference patterns/examples — not deployed by this root module. Optional NAT and Flow Logs are disabled by default.
 
-# AWS Enterprise Cloud Governance & Security Platform
-
-<p align="center">
-  <img src="https://img.shields.io/badge/Cloud-AWS-FF9900?logo=amazonaws&logoColor=white" />
-  <img src="https://img.shields.io/badge/IaC-Terraform-7B42BC?logo=terraform&logoColor=white" />
-  <img src="https://img.shields.io/badge/Security-Shift--Left-1F6FEB" />
-  <img src="https://img.shields.io/badge/CI-GitHub_Actions-2088FF?logo=githubactions&logoColor=white" />
-  <img src="https://img.shields.io/badge/Status-Lab--Ready-orange" />
-</p>
-
-> A practical AWS platform engineering lab covering repeatable network infrastructure, identity federation, governance guardrails, security visibility, CI quality gates and production operations.
-
-**Audience:** Senior DevOps / DevSecOps Engineers, Cloud Platform Engineers, Cloud Security Engineers and SREs.
-
-## Enterprise architecture
-
-The diagram below is rendered natively by GitHub Mermaid. It does not depend on SVG preview support.
+## Enterprise reference architecture
 
 ```mermaid
 flowchart TB
-    subgraph ORG["AWS ORGANIZATION — GOVERNANCE LAYER"]
-        MGMT["Management Account<br/>Organizations • Control Tower"]
-        SCP["SCP Guardrails<br/>Maximum permissions"]
-        SSO["IAM Identity Center<br/>Federated workforce access"]
-        MGMT --> SCP
-        MGMT --> SSO
-    end
-
-    subgraph DELIVERY["SECURE DELIVERY"]
-        GH["GitHub Actions"]
-        OIDC["GitHub OIDC"]
-        TF["Terraform Plan / Review / Apply"]
-        GH --> OIDC --> TF
-    end
-
-    subgraph WORKLOAD["WORKLOAD ACCOUNT — DEV / TEST / PROD"]
-        VPC["Amazon VPC"]
-        PUB["Public Subnets<br/>Ingress / NAT"]
-        PRIV["Private Subnets<br/>Application workloads"]
-        IAM["IAM Roles + KMS"]
-        VPC --> PUB
-        VPC --> PRIV
-        TF --> VPC
-        TF --> IAM
-    end
-
-    subgraph SECURITY["CENTRAL SECURITY & AUDIT ACCOUNTS"]
-        CT["Organization CloudTrail"]
-        S3["Log Archive<br/>S3 + KMS + retention"]
-        GD["GuardDuty"]
-        SH["Security Hub"]
-        CFG["AWS Config"]
-        CT --> S3
-        GD --> SH
-        CFG --> SH
-    end
-
-    SCP -. "govern" .-> WORKLOAD
-    SSO -. "workforce access" .-> WORKLOAD
-    VPC -. "network / API telemetry" .-> CT
-    IAM -. "API activity" .-> CT
-    WORKLOAD -. "security findings" .-> GD
+  subgraph Org[Organization governance - reference design]
+    Mgmt[Management account]
+    SCP[Service Control Policies]
+    SSO[IAM Identity Center]
+    Mgmt --> SCP
+    Mgmt --> SSO
+  end
+  subgraph Delivery[Secure delivery]
+    GH[GitHub Actions]
+    OIDC[GitHub OIDC]
+    TF[Terraform plan and review]
+    GH --> OIDC --> TF
+  end
+  subgraph Workload[Workload account]
+    VPC[Amazon VPC]
+    Public[Public subnets]
+    Private[Private subnets]
+    VPC --> Public
+    VPC --> Private
+    TF --> VPC
+  end
+  subgraph Audit[Central security - reference design]
+    CT[CloudTrail]
+    S3[Central log archive]
+    GD[GuardDuty]
+    SH[Security Hub]
+    CT --> S3
+    GD --> SH
+  end
+  SCP -. governs .-> Workload
+  SSO -. workforce identity .-> Workload
+  Workload -. audit events .-> CT
 ```
 
-**Important:** This is a target-state reference architecture, not a screenshot of deployed AWS resources. The Terraform currently implements a single-account VPC foundation. Organization-level services are documented patterns and examples, not deployed by the current root module.
+The diagram shows an enterprise target-state pattern. It is not evidence that an AWS Organization or central security account has been provisioned.
 
-Read the [enterprise account model](docs/architecture/enterprise-account-model.md) and [architecture guide](docs/architecture/README.md).
+## Terraform network foundation
 
-## What is implemented
+The lab VPC uses the address range `10.40.0.0/16` with public and private subnets across two Availability Zones.
 
-| Capability | Current repository scope |
+```mermaid
+flowchart TB
+  IGW[Internet Gateway]
+  subgraph VPC[VPC 10.40.0.0/16]
+    subgraph AZA[Availability Zone A]
+      PubA[Public 10.40.1.0/24]
+      PrivA[Private 10.40.11.0/24]
+    end
+    subgraph AZB[Availability Zone B]
+      PubB[Public 10.40.2.0/24]
+      PrivB[Private 10.40.12.0/24]
+    end
+    NAT[Optional single NAT Gateway]
+    PrivA --> NAT
+    PrivB --> NAT
+  end
+  IGW --> PubA
+  IGW --> PubB
+```
+
+The optional single NAT Gateway is a cost-saving lab choice, not a highly available production egress pattern. Optional VPC Flow Logs are also disabled by default.
+
+## What is included
+
+| Capability | Current scope |
 |---|---|
-| Network foundation | Terraform VPC, two-AZ public/private subnet tiers, route tables and Internet Gateway |
-| Egress | Optional single NAT Gateway (disabled by default; billable) |
-| Network visibility | Optional VPC Flow Logs to CloudWatch Logs with configurable retention (disabled by default) |
-| CI | GitHub Actions: Terraform fmt/init/validate, TFLint, Checkov and example JSON validation |
-| Security examples | SCP guardrail samples and GitHub OIDC trust template |
-| Operations | Runbooks for audit, access, incident response, drift and recovery |
-| Interview prep | Senior Q&A and 20 detailed production incident scenarios, plus system-design cases |
+| Network foundation | Terraform VPC, two-AZ public/private subnets, route tables and Internet Gateway |
+| Egress | Optional single NAT Gateway |
+| Network visibility | Optional VPC Flow Logs to CloudWatch Logs with configurable retention |
+| CI | Terraform fmt/init/validate, TFLint, Checkov and example JSON validation |
+| Governance examples | SCP guardrail samples and GitHub OIDC trust template |
+| Operations | Audit, access, incident response, drift and recovery runbooks |
+| Interview preparation | Senior Q&A and production incident scenarios |
 
-## Network topology — Terraform lab
+## Quick start — credential-free validation
 
-```mermaid
-flowchart TB
-    IGW["Internet Gateway"]
-    subgraph VPC["VPC — 10.40.0.0/16"]
-      subgraph AZA["Availability Zone A"]
-        PA["Public subnet<br/>10.40.1.0/24"]
-        PRA["Private subnet<br/>10.40.11.0/24"]
-      end
-      subgraph AZB["Availability Zone B"]
-        PB["Public subnet<br/>10.40.2.0/24"]
-        PRB["Private subnet<br/>10.40.12.0/24"]
-      end
-      NAT["Optional NAT Gateway<br/>in Public subnet A"]
-      PA --- NAT
-      PRA --> NAT
-      PRB --> NAT
-    end
-    IGW --> PA
-    IGW --> PB
-```
-
-NAT is disabled by default. When enabled, this lab uses one NAT Gateway in the first public subnet; this is a cost-saving lab topology, not a highly available production egress design.
-
-## Quick start — local validation only
-
-Prerequisites: Terraform 1.6+, AWS CLI v2 and Git.
+Requirements: Terraform 1.6+, AWS CLI v2 and Git.
 
 ```bash
 git clone https://github.com/haqueamir70-coder/aws-enterprise-cloud-governance-security-platform.git
@@ -127,55 +108,63 @@ terraform -chdir=terraform init -backend=false
 terraform -chdir=terraform validate
 ```
 
-These commands do not create AWS resources. GitHub Actions runs the same baseline checks plus lint and static security scanning.
+These commands do not create AWS resources. CI runs the baseline checks plus lint and static security scanning.
 
-For a real sandbox deployment, first read the [deployment guide](docs/deployment/README.md), verify the AWS identity and estimate cost:
+## Optional sandbox deployment
+
+Read the [deployment guide](docs/deployment/README.md) first. Confirm account identity and estimate cost:
 
 ```bash
 aws sts get-caller-identity
 terraform -chdir=terraform plan -out=tfplan
 terraform -chdir=terraform show tfplan
-# Apply only after reviewing and approving the plan:
+```
+
+Apply only after reviewing and approving the plan:
+
+```bash
 terraform -chdir=terraform apply tfplan
 ```
+
+NAT Gateway, CloudWatch Logs and other enabled services can incur charges. Destroy lab resources after testing and verify no billable resources remain.
+
+## Governance and security principles
+
+- OIDC federation instead of long-lived AWS access keys.
+- Separate workload, provisioning and audit identities.
+- SCPs define maximum permissions; they do not grant permissions.
+- Test SCPs in a non-production OU and preserve a break-glass recovery path.
+- Restrict remote Terraform state and enable locking.
+- Centralize audit data with retention and access controls in a real multi-account rollout.
+- Review region, quotas, egress paths and cost before applying.
 
 ## Repository map
 
 ```text
-.github/workflows/      CI quality gates
-docs/architecture/      Account model, trust boundaries and flows
-docs/assets/            Original SVG assets (optional download)
-docs/deployment/        Safe deployment and teardown
-docs/interview/         Senior Q&A and production scenarios
-docs/runbooks/          Operational procedures
-docs/security/          Control catalogue and validation matrix
+.github/workflows/      Terraform and policy CI
+terraform/              Single-account VPC foundation
 policies/               SCP and OIDC examples
-terraform/              Single-account network foundation
+docs/architecture/      Account model and trust boundaries
+docs/deployment/         Safe deployment and teardown
+docs/security/           Control catalogue and validation matrix
+docs/runbooks/           Operational procedures
+docs/interview/          Senior Q&A and production scenarios
 ```
 
-## Scope boundaries — read before deployment
+## Validation evidence
 
-- **Implemented:** the Terraform root provisions a single-account VPC foundation. Optional NAT and Flow Logs are off by default.
-- **Reference design / examples:** Organizations, Control Tower, centralized organization CloudTrail, delegated security administration, Security Hub and GuardDuty are documented patterns; they are not deployed by this Terraform root.
-- **No credentials in Git:** use short-lived credentials and OIDC. Never commit access keys, Terraform state, plan files or secrets.
-- **Cost:** NAT, CloudWatch log ingestion/retention, Config evaluations, Security Hub and GuardDuty can incur charges. Review current pricing and destroy lab resources after testing.
-- **SCP caution:** SCPs set maximum permissions; they do not grant permissions. Test in a non-production OU and preserve break-glass recovery.
-
-See [delivery status](docs/DELIVERY-STATUS.md) for implementation evidence and CI status.
+A green Terraform CI run validates the configured static checks. It does not prove that Organizations, Control Tower, GuardDuty, Security Hub or centralized logging are deployed. See [delivery status](docs/DELIVERY-STATUS.md) and [Actions](../../actions).
 
 ## Senior interview preparation
 
-Start with the [interview index](docs/interview/README.md), then practice the [advanced production scenarios](docs/interview/advanced-production-scenarios.md). Each incident answer follows containment, evidence, diagnosis, recovery and prevention. Do not memorize paragraphs; explain decisions and trade-offs.
+Start with [interview index](docs/interview/README.md), then work through [advanced production scenarios](docs/interview/advanced-production-scenarios.md). Explain containment, evidence, diagnosis, recovery and prevention — not just service definitions.
 
-## Contributing
+## Contributing and license
 
-Use small pull requests, include test output where practical, explain security impact and update documentation. See [CONTRIBUTING.md](CONTRIBUTING.md).
+See [CONTRIBUTING.md](CONTRIBUTING.md). MIT license: [LICENSE](LICENSE).
 
-## License
+## Maintainer
 
-MIT. See [LICENSE](LICENSE).
+**MD Amirul Haque** · [GitHub](https://github.com/haqueamir70-coder) · [LinkedIn](https://www.linkedin.com/in/md-amirul-haque/)
 
-
-## Architecture and interview preparation
-
-See the [architecture diagram and interview questions](docs/README.md) for the repository-specific design walkthrough and technical interview guide.
+<sub>Govern cloud access. Segment network trust. Preserve audit evidence.</sub>
