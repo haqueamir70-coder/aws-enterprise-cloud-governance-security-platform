@@ -1,3 +1,15 @@
+<div align="center">
+
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:111827,50:FF9900,100:FBBF24&height=190&section=header&text=AWS+Enterprise+Cloud+Governance&fontSize=32&fontColor=ffffff&animation=fadeIn" alt="AWS Enterprise Cloud Governance project banner" width="100%" />
+
+<img src="https://readme-typing-svg.demolab.com/?font=Inter&weight=600&size=16&pause=1600&color=38BDF8&center=true&vCenter=true&width=900&height=36&lines=AWS+Enterprise+Cloud+Governance+%E2%80%A2+Architecture+%E2%80%A2+Automation+%E2%80%A2+Security" alt="Animated project focus line" />
+
+![AWS](https://img.shields.io/badge/Cloud+Governance-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white) ![Terraform](https://img.shields.io/badge/Infrastructure+as+Code-844FBA?style=for-the-badge&logo=terraform&logoColor=white) ![Security](https://img.shields.io/badge/Cloud+Security-2563EB?style=for-the-badge)
+
+</div>
+
+---
+
 # AWS Enterprise Cloud Governance & Security Platform
 
 <p align="center">
